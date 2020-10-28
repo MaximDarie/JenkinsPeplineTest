@@ -1,0 +1,37 @@
+stages:
+- build
+- test
+- deploy
+build:
+stage: build
+script:
+- echo "Building the app"
+- "dotnet publish MySolution.sln -c release"
+artifacts:
+untracked: true
+only:
+- dev
+test:
+stage: test
+script: echo "Running tests"
+artifacts:
+untracked: true
+dependencies:
+- build
+only:
+- dev
+deploy_staging:
+stage: deploy
+script:
+- echo "Deployintg to staging server Admin"
+- ren c:\\inetpub\\vhosts\\xxx\\admin\\app_offline.htm_ app_offline.htm
+- dotnet publish PathToAdmin.csproj -c release -o c:\\inetpub\\vhosts\\xxx\\admin
+- ren c:\\inetpub\\vhosts\\xxx\\admin\\app_offline.htm app_offline.htm_
+- echo "Deployintg to staging server User"
+- ren c:\\inetpub\\vhosts\\xxx\\user\\app_offline.htm_ app_offline.htm
+- dotnet publish PathToUser.csproj -c release -o c:\\inetpub\\vhosts\\xxx\\user
+- ren c:\\inetpub\\vhosts\\xxx\\user\\app_offline.htm app_offline.htm_
+dependencies:
+- build
+only:
+- dev
